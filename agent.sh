@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# OneDash Agent
+# NodeHost Agent
 #
 
 # Set environment
@@ -10,9 +10,9 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 version="0.1.1"
 
 # Authentication required
-if [ -f /etc/onedash/auth.log ]
+if [ -f /etc/nodehost/auth.log ]
 then
-	auth=($(cat /etc/onedash/auth.log))
+	auth=($(cat /etc/nodehost/auth.log))
 else
 	echo "Error: Authentication log is missing."
 	exit 1
@@ -178,9 +178,9 @@ cpu=$((${stat[0]}+${stat[1]}+${stat[2]}+${stat[3]}))
 io=$((${stat[3]}+${stat[4]}))
 idle=${stat[3]}
 
-if [ -e /etc/onedash/data.log ]
+if [ -e /etc/nodehost/data.log ]
 then
-	data=($(cat /etc/onedash/data.log))
+	data=($(cat /etc/nodehost/data.log))
 	interval=$(($time-${data[0]}))
 	cpu_gap=$(($cpu-${data[1]}))
 	io_gap=$(($io-${data[2]}))
@@ -208,7 +208,7 @@ then
 fi
 
 # System load cache
-echo "$time $cpu $io $idle $rx $tx" > /etc/onedash/data.log
+echo "$time $cpu $io $idle $rx $tx" > /etc/nodehost/data.log
 
 # Prepare load variables
 rx_gap=$(prep $(num "$rx_gap"))
@@ -227,9 +227,9 @@ data_post="token=${auth[0]}&version=$(base "$version")&uptime=$(base "$uptime")&
 # API request with automatic termination
 if [ -n "$(command -v timeout)" ]
 then
-	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/onedash/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari OneDash Agent" --post-data "$data_post" --no-check-certificate "https://push.onedash.ca/server_monitoring/"
+	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://distributed.nodehost.ca/servermonitoring/"
 else
-	wget -q -o /dev/null -O /etc/onedash/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari OneDash Agent" --post-data "$data_post" --no-check-certificate "https://push.onedash.ca/server_monitoring/"
+	wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://distributed.nodehost.ca/servermonitoring/"
 	wget_pid=$!
 	wget_counter=0
 	wget_timeout=30
