@@ -1,18 +1,18 @@
 #!/bin/bash
 #
-# OneDash Agent Installation Script
+# NodeHost Agent Installation Script
 #
 
 # Set environment
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Prepare output
-echo -e "|\n|   OneDash Installer\n|   ===================\n|"
+echo -e "|\n|   NodeHost Installer\n|   ===================\n|"
 
 # Root required
 if [ $(id -u) != "0" ];
 then
-	echo -e "|   Error: You need to be root to install the OneDash agent\n|"
+	echo -e "|   Error: You need to be root to install the NodeHost agent\n|"
 	echo -e "|          The agent itself will NOT be running as root but instead under its own non-privileged user\n|"
 	exit 1
 fi
@@ -101,45 +101,45 @@ then
 fi
 
 # Attempt to delete previous agent
-if [ -f /etc/onedash/agent.sh ]
+if [ -f /etc/nodehost/agent.sh ]
 then
 	# Remove agent dir
-	rm -Rf /etc/onedash
+	rm -Rf /etc/nodehost
 
 	# Remove cron entry and user
-	if id -u onedash >/dev/null 2>&1
+	if id -u nodehost >/dev/null 2>&1
 	then
-		(crontab -u onedash -l | grep -v "/etc/onedash/agent.sh") | crontab -u onedash - && userdel onedash
+		(crontab -u nodehost -l | grep -v "/etc/nodehost/agent.sh") | crontab -u nodehost - && userdel nodehost
 	else
-		(crontab -u root -l | grep -v "/etc/onedash/agent.sh") | crontab -u root -
+		(crontab -u root -l | grep -v "/etc/nodehost/agent.sh") | crontab -u root -
 	fi
 fi
 
 # Create agent dir
-mkdir -p /etc/onedash
+mkdir -p /etc/nodehost
 
 # Download agent
-echo -e "|   Downloading agent.sh to /etc/onedash\n|\n|   + $(wget -nv -o /dev/stdout -O /etc/onedash/agent.sh --no-check-certificate https://raw.github.com/OneDashCA/onedash-monitor-agent/master/agent.sh)"
+echo -e "|   Downloading agent.sh to /etc/nodehost\n|\n|   + $(wget -nv -o /dev/stdout -O /etc/nodehost/agent.sh --no-check-certificate https://raw.github.com/NodeHostCA/monitor-agent/master/agent.sh)"
 
-if [ -f /etc/onedash/agent.sh ]
+if [ -f /etc/nodehost/agent.sh ]
 then
 	# Create auth file
-	echo "$1" > /etc/onedash/auth.log
+	echo "$1" > /etc/nodehost/auth.log
 
 	# Create user
-	useradd onedash -r -d /etc/onedash -s /bin/false
+	useradd nodehost -r -d /etc/nodehost -s /bin/false
 
 	# Modify user permissions
-	chown -R onedash:onedash /etc/onedash && chmod -R 700 /etc/onedash
+	chown -R nodehost:nodehost /etc/nodehost && chmod -R 700 /etc/nodehost
 
 	# Modify ping permissions
 	chmod +s `type -p ping`
 
 	# Configure cron
-	crontab -u onedash -l 2>/dev/null | { cat; echo "* * * * * bash /etc/onedash/agent.sh > /etc/onedash/cron.log 2>&1"; } | crontab -u onedash -
+	crontab -u nodehost -l 2>/dev/null | { cat; echo "* * * * * bash /etc/nodehost/agent.sh > /etc/nodehost/cron.log 2>&1"; } | crontab -u nodehost -
 
 	# Show success
-	echo -e "|\n|   Success: The OneDash agent has been installed\n|"
+	echo -e "|\n|   Success: The NodeHost agent has been installed\n|"
 
 	# Attempt to delete installation script
 	if [ -f $0 ]
@@ -148,5 +148,5 @@ then
 	fi
 else
 	# Show error
-	echo -e "|\n|   Error: The OneDash agent could not be installed\n|"
+	echo -e "|\n|   Error: The NodeHost agent could not be installed\n|"
 fi
