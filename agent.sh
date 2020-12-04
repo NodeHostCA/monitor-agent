@@ -224,12 +224,15 @@ ping_ca=$(prep $(num "$(ping -c 2 -w 2 n12.nodehost.ca | grep rtt | cut -d'/' -f
 # Build data for post
 data_post="token=${auth[0]}&version=$(base "$version")&uptime=$(base "$uptime")&sessions=$(base "$sessions")&processes=$(base "$processes")&processes_array=$(base "$processes_array")&file_handles=$(base "$file_handles")&file_handles_limit=$(base "$file_handles_limit")&os_kernel=$(base "$os_kernel")&os=$(base "$os_name")&os_arch=$(base "$os_arch")&cpu_name=$(base "$cpu_name")&cpu_cores=$(base "$cpu_cores")&cpu_freq=$(base "$cpu_freq")&ram_total=$(base "$ram_total")&ram_usage=$(base "$ram_usage")&swap_total=$(base "$swap_total")&swap_usage=$(base "$swap_usage")&disk_array=$(base "$disk_array")&disk_total=$(base "$disk_total")&disk_usage=$(base "$disk_usage")&connections=$(base "$connections")&network=$(base "$nic")&network_ipv4=$(base "$ipv4")&network_ipv6=$(base "$ipv6")&network_rx=$(base "$rx")&network_tx=$(base "$tx")&network_rx_gap=$(base "$rx_gap")&network_tx_gap=$(base "$tx_gap")&load=$(base "$load")&load_cpu=$(base "$load_cpu")&load_io=$(base "$load_io")&ping_eu=$(base "$ping_eu")&ping_us=$(base "$ping_us")&ping_ca=$(base "$ping_ca")"
 
+# Random Server To Send To
+sendto=$(awk -v min=5 -v max=15 'BEGIN{srand(); printf("%.2d", int(min+rand()*(max-min+1)))}')
+
 # API request with automatic termination
 if [ -n "$(command -v timeout)" ]
 then
-	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://distributed.nodehost.ca/service/servermonitoring/"
+	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendto.nodehost.ca/service/servermonitoring/"
 else
-	wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://distributed.nodehost.ca/service/servermonitoring/"
+	wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendto.nodehost.ca/service/servermonitoring/"
 	wget_pid=$!
 	wget_counter=0
 	wget_timeout=30
