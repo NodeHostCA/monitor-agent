@@ -226,13 +226,14 @@ data_post="token=${auth[0]}&version=$(base "$version")&uptime=$(base "$uptime")&
 
 # Random Server To Send To
 sendto=$(awk -v min=5 -v max=15 'BEGIN{srand(); printf("%.2d", int(min+rand()*(max-min+1)))}')
+sendstriped="${sendto#"${sendto%%[!0]*}"}"
 
 # API request with automatic termination
 if [ -n "$(command -v timeout)" ]
 then
-	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendto.nodehost.ca/service/servermonitoring/"
+	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendstriped.nodehost.ca/service/servermonitoring/"
 else
-	wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendto.nodehost.ca/service/servermonitoring/"
+	wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendstriped.nodehost.ca/service/servermonitoring/"
 	wget_pid=$!
 	wget_counter=0
 	wget_timeout=30
