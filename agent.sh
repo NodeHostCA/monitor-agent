@@ -231,9 +231,9 @@ sendstriped="${sendto#"${sendto%%[!0]*}"}"
 # API request with automatic termination
 if [ -n "$(command -v timeout)" ]
 then
-	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendstriped.nodehost.ca/service/servermonitoring/"
+	timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://n$sendstriped.nodehost.ca/service/servermonitoring/"
 else
-	wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://secure-n$sendstriped.nodehost.ca/service/servermonitoring/"
+	wget -q -o /dev/null -O /etc/nodehost/agent.log -T 25 -U "Mozilla/5.0 (Macintosh; Intel Mac OS) AppleWebKit/Safari NodeHost Agent" --post-data "$data_post" --no-check-certificate "https://n$sendstriped.nodehost.ca/service/servermonitoring/"
 	wget_pid=$!
 	wget_counter=0
 	wget_timeout=30
